@@ -1,7 +1,3 @@
-Certainly! Below is a template for a README file for your project:
-
----
-
 # Evolutionary Neural Network Game Controller
 
 This project implements a Java program that evolves feed-forward neural networks to control two classic arcade games: Breakout and Pacman. The goal is to optimize the performance of the neural networks using a genetic algorithm.
