@@ -4,6 +4,7 @@ import javax.swing.JFrame;
 
 import pacman.RandomController;
 import utils.GameController;
+import AlgoritmoGenetico.AlgoritmoGenetico;
 
 public class Breakout extends JFrame {
 
@@ -20,7 +21,14 @@ public class Breakout extends JFrame {
 		setVisible(true);
 	}
 	
-	public static void main(String[] args){
-		Breakout b = new Breakout(new RandomController(), 9);
-	}
+	public static void main(String[] args) {
+        AlgoritmoGenetico ag = new AlgoritmoGenetico();
+
+        BreakoutBoard sol = ag.iniciaProcura();
+        if (sol == null) {
+            System.out.println("Nao foi encontrada nenhuma solucao");
+        } else {
+            System.out.println(sol);
+        }
+    }
 }
