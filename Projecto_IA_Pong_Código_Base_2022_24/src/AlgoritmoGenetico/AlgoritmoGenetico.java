@@ -40,7 +40,8 @@ public class AlgoritmoGenetico {
                 System.out.println(populacao[k]);
             }
 /*
-            if(populacao[0].getFitness() == //TODO){
+            Como Calcular o fitness ideal?
+            if(populacao[0].getFitness() == //TODO Como Calcular o fitness ideal?){
                 System.out.println("Resultado encontrado na geração: " + i);
                 return populacao[0];
             }
@@ -53,16 +54,23 @@ public class AlgoritmoGenetico {
                 novaPopulacao[j] = filhos[0];
                 novaPopulacao[j + 50] = filhos[1];
             }
-            for(int z = 0; z < NUM_POPULACAO; z++){
-                double rand = Math.random();
-                if(rand < 0.05){
-                    novaPopulacao[z].changeRandValue();
-                }
-            }
+
+            novaPopulacao = mutation(novaPopulacao);
+
             populacao = novaPopulacao;
         }
 
         return null;
+    }
+
+    private BreakoutBoard[] mutation(BreakoutBoard breakoutboard[]){
+        for(int z = 0; z < NUM_POPULACAO; z++){
+            double rand = Math.random();
+            if(rand < MUTATION_RATE){
+                BreakoutBoard.changeRandValue() //TODO Como aplicar a mutação?;
+            }
+        }
+        return breakoutboard;
     }
 
     private BreakoutBoard selectParent(){
@@ -96,7 +104,7 @@ public class AlgoritmoGenetico {
         }
 
         BreakoutBoard[] parents = new BreakoutBoard[2];
-        parents[0] = new BreakoutBoard(controller, false, //TODO);
+        parents[0] = new BreakoutBoard(controller, false, //TODO qual o valor seed? qual a forma de criaçao de breakoutboard mais adequada?);
         parents[1] = new BreakoutBoard(controller, false, //TODO);
 
         return rainhas;
