@@ -3,132 +3,71 @@ package Generational_Algorithm;
 import utils.GameController;
 
 public class NeuralNetworkGameController implements GameController {
-	private int inputDim;
-	private int hiddenDim;
-	private int outputDim;
-	public double[][] hiddenWeights;
-	public double[] hiddenBiases;
-	public double[][] outputWeights;
-	public double[] outputBiases;
-	
-	public NeuralNetworkGameController(int inputDim, int hiddenDim, int outputDim, double[] values) {
-		
-		this.inputDim = inputDim;
-		this.hiddenDim = hiddenDim;
-		this.outputDim = outputDim;
-		
-		int index = 0;
-		
-		hiddenWeights = new double[inputDim][hiddenDim];
-		for(int i = 0; i < inputDim; i++) {
-			for(int j = 0; j< hiddenDim; j++) {
-				hiddenWeights[i][j] = values[index];
-				index++;
-			}
-		}
-		
-		hiddenBiases = new double[hiddenDim];
-		
-		for(int i = 0; i < hiddenDim; i++) {
-			hiddenBiases[i] = values[index];
-			index++;
-		}
-		
-		outputWeights = new double[hiddenDim][outputDim];
-		for(int i = 0; i < hiddenDim; i++) {
-			for(int j = 0; j< outputDim; j++) {
-				outputWeights[i][j] = values[index];
-				index++;
-			}
-		}
-		outputBiases = new double[outputDim];
-		for(int i = 0; i < outputDim; i++) {
-			outputBiases[i] = values[index];
-			index++;
-		}
-		
-		//[w1,1; w1,2; w2,1; w2,2; B1; B2; w1,o; w2,o; Bo]
-	}
-	
-	public static NeuralNetworkGameController getNN(int inputDim, int hiddenDim, int outputDim, double[] values) {
-        return new NeuralNetworkGameController(inputDim, hiddenDim, outputDim, values);
+    private double[][] hiddenWeights;
+    private double[] hiddenBiases;
+    private double[][] outputWeights;
+    private double[] outputBiases;
+    private int inputDim;
+    private int hiddenDim;
+    private int outputDim;
+
+    public NeuralNetworkGameController(int inputDim, int hiddenDim, int outputDim, double[] values) {
+        // Initialize neural network weights and biases
+        // (Code for initializing hiddenWeights, hiddenBiases, outputWeights, and outputBiases)
     }
-	
-	private static double sigmoid(double x){
-	    return 1 / (1 + Math.exp(-x));
-	}
-	
-	public double[] forward(double[] inputValues) {
-		double[] valuesHidden = new double[hiddenDim];
-		for(int i = 0; i < hiddenDim; i++){
-			for(int j = 0; j < inputDim; j++){
-				valuesHidden[i] += hiddenWeights[j][i] * inputValues[j]; 
-			}
-		valuesHidden[i] = sigmoid(valuesHidden[i] + hiddenBiases[i]); 
-		}
-		
-		double[] valuesOutput = new double[outputDim];
-		for(int i = 0; i < outputDim; i++){
-			for(int j = 0; j < hiddenDim; j++){
-				valuesOutput[i] += outputWeights[j][i] * valuesHidden[j]; 
-			}
-			valuesOutput[i] = sigmoid(valuesOutput[i] + outputBiases[i]); 
-		}
-		return valuesOutput;
-	}
-	
-	
-	@Override
-	public String toString() {
-		String result = "Neural Network: \nNumber of inputs: " + inputDim + "\n"
-				+ "Weights between input and hidden layer with " + hiddenDim + "neurons: \n";
-		String hidden = "";
-		for (int input = 0; input < inputDim; input++) {
-			for (int i = 0; i < hiddenDim; i++) {
-				hidden += " w" + (input + 1) + (i + 1) + ": " + hiddenWeights[input][i] + "\n";
-			}
-		}
-		result += hidden;
-		String biasHidden = "Hidden biases: \n";
-		for (int i = 0; i < hiddenDim; i++) {
-			biasHidden += " b " + (i + 1) + ": " + hiddenBiases[i] + "\n";
-		}
-		result += biasHidden;
-		String output = "Weights between hidden and output layer with " + outputDim + " neurons: \n";
-		for (int hiddenw = 0; hiddenw < hiddenDim; hiddenw++) {
-			for (int i = 0; i < outputDim; i++) {
-				output += " w" + (hiddenw + 1) + "o" + (i + 1) + ": " + outputWeights[hiddenw][i] + "\n";
-			}
-		}
-		result += output;
-		String biasOutput = "Ouput biases: \n";
-		for (int i = 0; i < outputDim; i++) {
-			biasOutput += " bo" + (i + 1) + ": " + outputBiases[i] + "\n";
-		}
-		result += biasOutput;
-		return result;
-	}
 
-	@Override
-	public int nextMove(int[] currentState) {
-	    // Preprocess the input state (if needed)
-	    double[] inputValues = preprocessInput(currentState);
+    // Forward pass through the neural network
+    public double[] forward(double[] inputValues) {
+        // Compute values in the hidden layer
+        double[] valuesHidden = computeLayerValues(inputValues, hiddenWeights, hiddenBiases);
 
-	    // Forward propagate the input through the neural network
-	    double[] outputValues = forward(inputValues);
+        // Compute values in the output layer
+        double[] valuesOutput = computeLayerValues(valuesHidden, outputWeights, outputBiases);
 
-	    // Interpret the output to determine the next move
-	    int nextMove = interpretOutput(outputValues);
+        return valuesOutput;
+    }
 
-	    return nextMove;
-	}
+    // Preprocess input state if needed (e.g., normalize values)
+    private double[] preprocessInput(int[] currentState) {
+        // Preprocess input state (if needed) and return
+        return null; // Placeholder, replace with actual preprocessing logic
+    }
 
-	public void setHiddenWeights(double[][] hiddenWeights) {
-	    this.hiddenWeights = hiddenWeights;
-	}
+    // Interpret output to determine the next move
+    private int interpretOutput(double[] outputValues) {
+        // Interpret output values to determine the next move
+        return 0; // Placeholder, replace with actual interpretation logic
+    }
 
-	public void setOutputWeights(double[][] outputWeights) {
-	    this.outputWeights = outputWeights;
-	}
+    @Override
+    public int nextMove(int[] currentState) {
+        // Preprocess input state (if needed)
+        double[] inputValues = preprocessInput(currentState);
 
+        // Forward propagate input through the neural network
+        double[] outputValues = forward(inputValues);
+
+        // Interpret output to determine next move
+        int nextMove = interpretOutput(outputValues);
+
+        return nextMove;
+    }
+
+    // Helper method to compute layer values
+    private double[] computeLayerValues(double[] inputValues, double[][] weights, double[] biases) {
+        double[] layerValues = new double[weights[0].length];
+        for (int i = 0; i < weights[0].length; i++) {
+            double weightedSum = biases[i];
+            for (int j = 0; j < weights.length; j++) {
+                weightedSum += inputValues[j] * weights[j][i];
+            }
+            layerValues[i] = sigmoid(weightedSum);
+        }
+        return layerValues;
+    }
+
+    // Sigmoid activation function
+    private double sigmoid(double x) {
+        return 1 / (1 + Math.exp(-x));
+    }
 }

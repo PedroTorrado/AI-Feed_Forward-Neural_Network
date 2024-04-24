@@ -1,5 +1,4 @@
-import java.util.ArrayList;
-import java.util.List;
+import java.awt.List;
 
 import breakout.BreakoutBoard;
 import utils.GameController;
@@ -8,7 +7,7 @@ public class GeneticAlgorithm {
 
     public static void main(String[] args) {
         // Initialize the population
-        Population population = new Population(100); // Example population size of 100
+        Population population = new Population(100, null); // Example population size of 100
 
         int maxGenerations = 1000;
         
