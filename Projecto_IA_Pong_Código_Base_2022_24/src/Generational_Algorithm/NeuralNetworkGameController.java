@@ -1,146 +1,101 @@
 package Generational_Algorithm;
 
+import breakout.BreakoutBoard;
+import utils.Commons;
 import utils.GameController;
 
-public class NeuralNetworkGameController implements GameController{
+public class NeuralNetworkGameController implements GameController {
 
-	private int inputDim;
-	private int hiddenDim;
-	private int outputDim;
-	
-	/**
-	 * @return the hiddenWeights
-	 */
-	public double[][] getHiddenWeights() {
-		return hiddenWeights;
-	}
+    private int inputDim;
+    private int hiddenDim;
+    private int outputDim;
 
-	/**
-	 * @param hiddenWeights the hiddenWeights to set
-	 */
-	public void setHiddenWeights(double[][] hiddenWeights) {
-		this.hiddenWeights = hiddenWeights;
-	}
+    double[][] hiddenWeights;
+    private double[] hiddenBiases;
+    double[][] outputWeights;
+    private double[] outputBiases;
 
+    public NeuralNetworkGameController(BreakoutBoard breakoutBoard) {
+        this.inputDim = Commons.BREAKOUT_STATE_SIZE;
+        this.hiddenDim = 10; // Example value, adjust as needed
+        this.outputDim = Commons.BREAKOUT_NUM_ACTIONS;
+        initializeParameters();
+    }
 
-	/**
-	 * @return the outputWeights
-	 */
-	public double[][] getOutputWeights() {
-		return outputWeights;
-	}
+    private void initializeParameters() {
+        hiddenWeights = new double[inputDim][hiddenDim];
+        hiddenBiases = new double[hiddenDim];
+        outputWeights = new double[hiddenDim][outputDim];
+        outputBiases = new double[outputDim];
 
-	/**
-	 * @param outputWeights the outputWeights to set
-	 */
-	public void setOutputWeights(double[][] outputWeights) {
-		this.outputWeights = outputWeights;
-	}
+        // Initialize weights and biases with random values
+        for (int i = 0; i < inputDim; i++) {
+            for (int j = 0; j < hiddenDim; j++) {
+                hiddenWeights[i][j] = Math.random() * 10;
+            }
+        }
+        for (int i = 0; i < hiddenDim; i++) {
+            hiddenBiases[i] = Math.random() * 10;
+        }
+        for (int i = 0; i < hiddenDim; i++) {
+            for (int j = 0; j < outputDim; j++) {
+                outputWeights[i][j] = Math.random() * 10;
+            }
+        }
+        for (int i = 0; i < outputDim; i++) {
+            outputBiases[i] = Math.random() * 10;
+        }
+    }
 
+    public int nextMove(int[] currentState) {
+        double[] hiddenLayer = new double[hiddenDim];
+        double[] outputLayer = new double[outputDim];
 
+        // Compute activations of hidden layer
+        for (int i = 0; i < hiddenDim; i++) {
+            double sum = 0.0;
+            for (int j = 0; j < inputDim; j++) {
+                sum += currentState[j] * hiddenWeights[j][i];
+            }
+            hiddenLayer[i] = sigmoid(sum + hiddenBiases[i]);
+        }
 
-	public double[][] hiddenWeights;
-	public double[] hiddenBiases;
-	public double[][] outputWeights;
-	public double[] outputBiases;
-	
-	public NeuralNetworkGameController() {
-		initializeParameters();
-	}
-	
-	private void initializeParameters() {
-		hiddenWeights = new double[hiddenDim][hiddenDim];
-		hiddenBiases = new double[hiddenDim];
-		outputWeights = new double[outputDim][outputDim];
-		outputBiases = new double[outputDim];
-		
-		for(int i = 0; i < hiddenDim; i++) {
-			for(int j = 0; j < hiddenDim; j++) {
-				hiddenWeights[i][j] = Math.random()*10;
-			}
-		}
-		for(int i = 0; i < hiddenDim; i++) {
-			hiddenBiases[i] = Math.random()*10;
-		}
-		for(int i = 0; i < outputDim; i++) {
-			for(int j = 0; j < outputDim; j++) {
-				outputWeights[i][j] = Math.random()*10;
-			}
-		}
-		for(int i = 0; i < outputDim; i++) {
-			outputBiases[i] = Math.random()*10;
-		}
-	}
-	
-	public double[] forward(int[] inputValues) {
-		double[] accHidden = new double[hiddenDim];
-		for(int i = 0; i< hiddenDim; i++) {
-			for(int j = 0; j<inputDim; j++) {
-				accHidden[i] += inputValues[j]*hiddenWeights[j][i];
-			}
-			accHidden[i] = sigmoid(accHidden[i]+hiddenBiases[i]);
-		}
-		double[] accOutput = new double[outputDim];
-		for(int i= 0; i<outputDim; i++) {
-			for(int j=0; j<hiddenDim; j++) {
-				accOutput[i] += accHidden[j]*outputWeights[j][i];
-			}
-			accOutput[i] = sigmoid(accOutput[i]+outputBiases[i]);
-		}
-		return accOutput;
-	}
-	
-	private double sigmoid(double x) {
-		return 1/(1+Math.exp(-x));
-	}
-	
-	
-	
-//	@Override
-//	public String toString() {
-//		String result = "Neural Network: \nNumber of inputs: " + inputDim + "\n"
-//				+ "Weights between input and hidden layer with " + hiddenDim + " neurons: \n";
-//		String hidden = "";
-//		for (int input = 0; input < inputDim; input++) {
-//			for (int i = 0; i < hiddenDim; i++) {
-//				hidden += " w" + (input + 1) + (i + 1) + ": " + hiddenWeights[input][i] + "\n";
-//			}
-//		}
-//		result += hidden;
-//		String biasHidden = "Hidden biases: \n";
-//		for (int i = 0; i < hiddenDim; i++) {
-//			biasHidden += " b " + (i + 1) + ": " + hiddenBiases[i] + "\n";
-//		}
-//		result += biasHidden;
-//		String output = "Weights between hidden and output layer with " + outputDim + " neurons: \n";
-//		for (int hiddenw = 0; hiddenw < hiddenDim; hiddenw++) {
-//			for (int i = 0; i < outputDim; i++) {
-//				output += " w" + (hiddenw + 1) + "o" + (i + 1) + ": " + outputWeights[hiddenw][i] + "\n";
-//			}
-//		}
-//		result += output;
-//		String biasOutput = "Ouput biases: \n";
-//		for (int i = 0; i < outputDim; i++) {
-//			biasOutput += " bo" + (i + 1) + ": " + outputBiases[i] + "\n";
-//		}
-//		result += biasOutput;
-//		return result;
-//	}
-	public int nextMove(int[] currentState) {
-	    double[] forwardResult = forward(currentState);
-	    
-	    // Check if the forward result array has at least two elements
-	    if (forwardResult.length >= 2) {
-	        if (forwardResult[0] < forwardResult[1]) {
-	            return 1;
-	        } else {
-	            return 2;
-	        }
-	    } else {
-	        // Handle the case when the forward result array doesn't have enough elements
-	        // You might want to return a default value or handle the situation differently based on your application logic
-	        return -1; // Default value, change as needed
-	    }
-	}
+        // Compute activations of output layer
+        for (int i = 0; i < outputDim; i++) {
+            double sum = 0.0;
+            for (int j = 0; j < hiddenDim; j++) {
+                sum += hiddenLayer[j] * outputWeights[j][i];
+            }
+            outputLayer[i] = sigmoid(sum + outputBiases[i]);
+        }
 
+        // Determine the action based on output values
+        if (outputLayer[0] < outputLayer[1]) {
+            return BreakoutBoard.RIGHT; // Move to the right
+        } else {
+            return BreakoutBoard.LEFT; // Move to the left
+        }
+    }
+
+    private double sigmoid(double x) {
+        return 1 / (1 + Math.exp(-x));
+    }
+
+    // Getter and setter methods for hiddenWeights
+    public double[][] getHiddenWeights() {
+        return hiddenWeights;
+    }
+
+    public void setHiddenWeights(double[][] hiddenWeights) {
+        this.hiddenWeights = hiddenWeights;
+    }
+
+    // Getter and setter methods for outputWeights
+    public double[][] getOutputWeights() {
+        return outputWeights;
+    }
+
+    public void setOutputWeights(double[][] outputWeights) {
+        this.outputWeights = outputWeights;
+    }
 }

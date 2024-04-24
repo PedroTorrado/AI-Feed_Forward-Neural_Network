@@ -1,9 +1,10 @@
 package Generational_Algorithm;
 
+import breakout.BreakoutBoard;
+import utils.GameController;
+
 import java.util.ArrayList;
 import java.util.List;
-
-import breakout.BreakoutBoard;
 
 public class Population {
 
@@ -20,7 +21,8 @@ public class Population {
 
     private void initializePopulation(int size, NeuralNetworkGameController nnController) {
         for (int i = 0; i < size; i++) {
-            BreakoutBoard agent = new BreakoutBoard(nnController, true, 10);
+            // Creating breakout boards with random seeds
+            BreakoutBoard agent = new BreakoutBoard(nnController, false, (int) (System.currentTimeMillis() * 1000));
             breakoutBoardList.add(agent);
         }
     }
@@ -47,23 +49,30 @@ public class Population {
     public List<NeuralNetworkGameController> selectParents(double[] fitnessValues) {
         List<NeuralNetworkGameController> parents = new ArrayList<>();
 
-        int tournamentSize = 2;
+        // Calculate total fitness
+        double totalFitness = 0;
+        for (double fitness : fitnessValues) {
+            totalFitness += fitness;
+        }
 
+        // Perform roulette wheel selection
         for (int i = 0; i < 2; i++) {
-            List<Integer> tournamentIndices = new ArrayList<>();
+            double randomValue = Math.random() * totalFitness;
+            double cumulativeFitness = 0;
+            int selectedParentIndex = -1;
 
-            for (int j = 0; j < tournamentSize; j++) {
-                int randomIndex = (int) (Math.random() * breakoutBoardList.size());
-                tournamentIndices.add(randomIndex);
+            for (int j = 0; j < fitnessValues.length; j++) {
+                cumulativeFitness += fitnessValues[j];
+                if (cumulativeFitness >= randomValue) {
+                    selectedParentIndex = j;
+                    break;
+                }
             }
 
-            double maxFitness = Double.MIN_VALUE;
-            int winnerIndex = -1;
-            for (int index : tournamentIndices) {
-                if (fitnessValues[index] > maxFitness) {
-                    maxFitness = fitnessValues[index];
-                    winnerIndex = index;
-                }
+            if (selectedParentIndex != -1) {
+                BreakoutBoard selectedBoard = breakoutBoardList.get(selectedParentIndex);
+                NeuralNetworkGameController selectedController = new NeuralNetworkGameController(selectedBoard);
+                parents.add(selectedController);
             }
         }
 
@@ -74,7 +83,8 @@ public class Population {
     public List<NeuralNetworkGameController> crossoverAndMutation(List<NeuralNetworkGameController> parents) {
         List<NeuralNetworkGameController> offspring = new ArrayList<>();
 
-        for (int i = 0; i < parents.size(); i += 2) {
+        // Ensure that there are at least two parents left to process
+        for (int i = 0; i < parents.size() - 1; i += 2) {
             NeuralNetworkGameController parent1 = parents.get(i);
             NeuralNetworkGameController parent2 = parents.get(i + 1);
 
@@ -91,15 +101,16 @@ public class Population {
         return offspring;
     }
 
+
     private NeuralNetworkGameController crossover(NeuralNetworkGameController p1, NeuralNetworkGameController p2) {
-        NeuralNetworkGameController child = new NeuralNetworkGameController();
+        NeuralNetworkGameController child = new NeuralNetworkGameController(bestIndividual);
         child.setHiddenWeights(p2.getHiddenWeights());
         child.setOutputWeights(p2.getOutputWeights());
         return child;
     }
 
     private void mutation(NeuralNetworkGameController child) {
-        double mutationRate = 0.05; // Adjust as needed
+        double mutationRate = 1; // Adjust as needed
 
         for (int i = 0; i < child.hiddenWeights.length; i++) {
             for (int j = 0; j < child.hiddenWeights[i].length; j++) {

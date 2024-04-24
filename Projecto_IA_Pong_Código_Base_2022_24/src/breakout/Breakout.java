@@ -2,6 +2,8 @@ package breakout;
 
 import javax.swing.JFrame;
 
+import Generational_Algorithm.BreakoutController;
+import Generational_Algorithm.NeuralNetworkGameController;
 import utils.GameController;
 
 public class Breakout extends JFrame {
@@ -17,6 +19,10 @@ public class Breakout extends JFrame {
 		setResizable(false);
 		pack();
 		setVisible(true);
+	}
+	
+	public static void main(String[] args) {
+		Breakout b = new Breakout(new BreakoutController(), 100);
 	}
 
 }
