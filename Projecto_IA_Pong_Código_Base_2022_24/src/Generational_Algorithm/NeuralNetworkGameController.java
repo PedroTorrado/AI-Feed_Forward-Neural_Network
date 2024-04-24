@@ -2,72 +2,145 @@ package Generational_Algorithm;
 
 import utils.GameController;
 
-public class NeuralNetworkGameController implements GameController {
-    private double[][] hiddenWeights;
-    private double[] hiddenBiases;
-    private double[][] outputWeights;
-    private double[] outputBiases;
-    private int inputDim;
-    private int hiddenDim;
-    private int outputDim;
+public class NeuralNetworkGameController implements GameController{
 
-    public NeuralNetworkGameController(int inputDim, int hiddenDim, int outputDim, double[] values) {
-        // Initialize neural network weights and biases
-        // (Code for initializing hiddenWeights, hiddenBiases, outputWeights, and outputBiases)
-    }
+	private int inputDim;
+	private int hiddenDim;
+	private int outputDim;
+	
+	/**
+	 * @return the hiddenWeights
+	 */
+	public double[][] getHiddenWeights() {
+		return hiddenWeights;
+	}
 
-    // Forward pass through the neural network
-    public double[] forward(double[] inputValues) {
-        // Compute values in the hidden layer
-        double[] valuesHidden = computeLayerValues(inputValues, hiddenWeights, hiddenBiases);
+	/**
+	 * @param hiddenWeights the hiddenWeights to set
+	 */
+	public void setHiddenWeights(double[][] hiddenWeights) {
+		this.hiddenWeights = hiddenWeights;
+	}
 
-        // Compute values in the output layer
-        double[] valuesOutput = computeLayerValues(valuesHidden, outputWeights, outputBiases);
 
-        return valuesOutput;
-    }
+	/**
+	 * @return the outputWeights
+	 */
+	public double[][] getOutputWeights() {
+		return outputWeights;
+	}
 
-    // Preprocess input state if needed (e.g., normalize values)
-    private double[] preprocessInput(int[] currentState) {
-        // Preprocess input state (if needed) and return
-        return null; // Placeholder, replace with actual preprocessing logic
-    }
+	/**
+	 * @param outputWeights the outputWeights to set
+	 */
+	public void setOutputWeights(double[][] outputWeights) {
+		this.outputWeights = outputWeights;
+	}
 
-    // Interpret output to determine the next move
-    private int interpretOutput(double[] outputValues) {
-        // Interpret output values to determine the next move
-        return 0; // Placeholder, replace with actual interpretation logic
-    }
 
-    @Override
-    public int nextMove(int[] currentState) {
-        // Preprocess input state (if needed)
-        double[] inputValues = preprocessInput(currentState);
 
-        // Forward propagate input through the neural network
-        double[] outputValues = forward(inputValues);
+	public double[][] hiddenWeights;
+	public double[] hiddenBiases;
+	public double[][] outputWeights;
+	public double[] outputBiases;
+	
+	public NeuralNetworkGameController() {
+		initializeParameters();
+	}
+	
+	private void initializeParameters() {
+		hiddenWeights = new double[hiddenDim][hiddenDim];
+		hiddenBiases = new double[hiddenDim];
+		outputWeights = new double[outputDim][outputDim];
+		outputBiases = new double[outputDim];
+		
+		for(int i = 0; i < hiddenDim; i++) {
+			for(int j = 0; j < hiddenDim; j++) {
+				hiddenWeights[i][j] = Math.random()*10;
+			}
+		}
+		for(int i = 0; i < hiddenDim; i++) {
+			hiddenBiases[i] = Math.random()*10;
+		}
+		for(int i = 0; i < outputDim; i++) {
+			for(int j = 0; j < outputDim; j++) {
+				outputWeights[i][j] = Math.random()*10;
+			}
+		}
+		for(int i = 0; i < outputDim; i++) {
+			outputBiases[i] = Math.random()*10;
+		}
+	}
+	
+	public double[] forward(int[] inputValues) {
+		double[] accHidden = new double[hiddenDim];
+		for(int i = 0; i< hiddenDim; i++) {
+			for(int j = 0; j<inputDim; j++) {
+				accHidden[i] += inputValues[j]*hiddenWeights[j][i];
+			}
+			accHidden[i] = sigmoid(accHidden[i]+hiddenBiases[i]);
+		}
+		double[] accOutput = new double[outputDim];
+		for(int i= 0; i<outputDim; i++) {
+			for(int j=0; j<hiddenDim; j++) {
+				accOutput[i] += accHidden[j]*outputWeights[j][i];
+			}
+			accOutput[i] = sigmoid(accOutput[i]+outputBiases[i]);
+		}
+		return accOutput;
+	}
+	
+	private double sigmoid(double x) {
+		return 1/(1+Math.exp(-x));
+	}
+	
+	
+	
+//	@Override
+//	public String toString() {
+//		String result = "Neural Network: \nNumber of inputs: " + inputDim + "\n"
+//				+ "Weights between input and hidden layer with " + hiddenDim + " neurons: \n";
+//		String hidden = "";
+//		for (int input = 0; input < inputDim; input++) {
+//			for (int i = 0; i < hiddenDim; i++) {
+//				hidden += " w" + (input + 1) + (i + 1) + ": " + hiddenWeights[input][i] + "\n";
+//			}
+//		}
+//		result += hidden;
+//		String biasHidden = "Hidden biases: \n";
+//		for (int i = 0; i < hiddenDim; i++) {
+//			biasHidden += " b " + (i + 1) + ": " + hiddenBiases[i] + "\n";
+//		}
+//		result += biasHidden;
+//		String output = "Weights between hidden and output layer with " + outputDim + " neurons: \n";
+//		for (int hiddenw = 0; hiddenw < hiddenDim; hiddenw++) {
+//			for (int i = 0; i < outputDim; i++) {
+//				output += " w" + (hiddenw + 1) + "o" + (i + 1) + ": " + outputWeights[hiddenw][i] + "\n";
+//			}
+//		}
+//		result += output;
+//		String biasOutput = "Ouput biases: \n";
+//		for (int i = 0; i < outputDim; i++) {
+//			biasOutput += " bo" + (i + 1) + ": " + outputBiases[i] + "\n";
+//		}
+//		result += biasOutput;
+//		return result;
+//	}
+	public int nextMove(int[] currentState) {
+	    double[] forwardResult = forward(currentState);
+	    
+	    // Check if the forward result array has at least two elements
+	    if (forwardResult.length >= 2) {
+	        if (forwardResult[0] < forwardResult[1]) {
+	            return 1;
+	        } else {
+	            return 2;
+	        }
+	    } else {
+	        // Handle the case when the forward result array doesn't have enough elements
+	        // You might want to return a default value or handle the situation differently based on your application logic
+	        return -1; // Default value, change as needed
+	    }
+	}
 
-        // Interpret output to determine next move
-        int nextMove = interpretOutput(outputValues);
-
-        return nextMove;
-    }
-
-    // Helper method to compute layer values
-    private double[] computeLayerValues(double[] inputValues, double[][] weights, double[] biases) {
-        double[] layerValues = new double[weights[0].length];
-        for (int i = 0; i < weights[0].length; i++) {
-            double weightedSum = biases[i];
-            for (int j = 0; j < weights.length; j++) {
-                weightedSum += inputValues[j] * weights[j][i];
-            }
-            layerValues[i] = sigmoid(weightedSum);
-        }
-        return layerValues;
-    }
-
-    // Sigmoid activation function
-    private double sigmoid(double x) {
-        return 1 / (1 + Math.exp(-x));
-    }
 }

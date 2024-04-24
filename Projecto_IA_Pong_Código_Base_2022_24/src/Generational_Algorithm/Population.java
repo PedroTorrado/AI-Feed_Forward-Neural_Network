@@ -8,10 +8,14 @@ import breakout.BreakoutBoard;
 public class Population {
 
     private List<BreakoutBoard> breakoutBoardList;
+    private BreakoutBoard bestIndividual;
+    private double bestFitness;
 
     public Population(int size, NeuralNetworkGameController nnController) {
         breakoutBoardList = new ArrayList<>();
         initializePopulation(size, nnController);
+        bestIndividual = null;
+        bestFitness = Double.MIN_VALUE;
     }
 
     private void initializePopulation(int size, NeuralNetworkGameController nnController) {
@@ -29,13 +33,19 @@ public class Population {
             breakoutBoard.runSimulation();
             double fitness = breakoutBoard.getFitness();
             fitnessValues[i] = fitness;
+
+            // Update best individual and its fitness
+            if (fitness > bestFitness) {
+                bestFitness = fitness;
+                bestIndividual = breakoutBoard;
+            }
         }
 
         return fitnessValues;
     }
 
-    public List<BreakoutBoard> selectParents(double[] fitnessValues) {
-        List<BreakoutBoard> parents = new ArrayList<>();
+    public List<NeuralNetworkGameController> selectParents(double[] fitnessValues) {
+        List<NeuralNetworkGameController> parents = new ArrayList<>();
 
         int tournamentSize = 2;
 
@@ -55,51 +65,63 @@ public class Population {
                     winnerIndex = index;
                 }
             }
-
-            if (winnerIndex != -1) {
-                parents.add(breakoutBoardList.get(winnerIndex));
-            }
         }
 
         return parents;
     }
 
-    public void crossoverAndMutation(List<BreakoutBoard> parents) {
-        List<BreakoutBoard> offspring = new ArrayList<>();
+
+    public List<NeuralNetworkGameController> crossoverAndMutation(List<NeuralNetworkGameController> parents) {
+        List<NeuralNetworkGameController> offspring = new ArrayList<>();
 
         for (int i = 0; i < parents.size(); i += 2) {
-            BreakoutBoard parent1 = parents.get(i);
-            BreakoutBoard parent2 = parents.get(i + 1);
+            NeuralNetworkGameController parent1 = parents.get(i);
+            NeuralNetworkGameController parent2 = parents.get(i + 1);
 
-            BreakoutBoard child1 = crossover(parent1, parent2);
-            BreakoutBoard child2 = crossover(parent2, parent1);
+            NeuralNetworkGameController child1 = crossover(parent1, parent2);
+            NeuralNetworkGameController child2 = crossover(parent2, parent1);
 
-            mutate(child1);
-            mutate(child2);
+            mutation(child1);
+            mutation(child2);
 
             offspring.add(child1);
             offspring.add(child2);
         }
 
-        replaceAgents(offspring);
+        return offspring;
     }
 
-    private void replaceAgents(List<BreakoutBoard> offspring) {
-        for (int i = 0; i < offspring.size(); i++) {
-            breakoutBoardList.set(i, offspring.get(i));
+    private NeuralNetworkGameController crossover(NeuralNetworkGameController p1, NeuralNetworkGameController p2) {
+        NeuralNetworkGameController child = new NeuralNetworkGameController();
+        child.setHiddenWeights(p2.getHiddenWeights());
+        child.setOutputWeights(p2.getOutputWeights());
+        return child;
+    }
+
+    private void mutation(NeuralNetworkGameController child) {
+        double mutationRate = 0.05; // Adjust as needed
+
+        for (int i = 0; i < child.hiddenWeights.length; i++) {
+            for (int j = 0; j < child.hiddenWeights[i].length; j++) {
+                if (Math.random() < mutationRate) {
+                    child.hiddenWeights[i][j] += (Math.random() * 0.5) + 0.1;
+                }
+            }
+        }
+        for (int i = 0; i < child.outputWeights.length; i++) {
+            for (int j = 0; j < child.outputWeights[i].length; j++) {
+                if (Math.random() < mutationRate) {
+                    child.outputWeights[i][j] += (Math.random() * 0.5) + 0.1;
+                }
+            }
         }
     }
 
-    private void mutate(BreakoutBoard child) {
-        double mutationRate = 0.005;
-
-        // Perform mutation on child (if needed)
-        // Example: child.mutate(mutationRate);
+    public BreakoutBoard getBestIndividual() {
+        return bestIndividual;
     }
 
-    private BreakoutBoard crossover(BreakoutBoard parent1, BreakoutBoard parent2) {
-        // Perform crossover between parent1 and parent2 to produce a child
-        // Example: BreakoutBoard child = parent1.crossover(parent2);
-        return null; // Placeholder, replace with actual crossover implementation
+    public double getBestFitness() {
+        return bestFitness;
     }
 }
