@@ -29,7 +29,7 @@ public class Population {
 	        // Access weight and bias arrays from agent (assuming appropriate getter/setter methods)
 	        double[][] hiddenWeights = agent.getHiddenWeights();
 	        double[][] outputWeights = agent.getOutputWeights();
-	        double[] hiddenBiases = agent.getHiddenBiases();
+	        double[] hiddenBiases = agent.getHiddenBiases(); 	
 	        double[] outputBiases = agent.getOutputBiases();
 
 	        // Random initialization with appropriate scaling (e.g., Xavier/He)
