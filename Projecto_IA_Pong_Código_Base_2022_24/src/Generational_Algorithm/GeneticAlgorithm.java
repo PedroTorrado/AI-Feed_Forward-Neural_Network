@@ -10,36 +10,24 @@ public class GeneticAlgorithm {
 
     public static void main(String[] args) {
         // Initialize the population with an instance of NeuralNetworkGameController
-        NeuralNetworkGameController nnController = new NeuralNetworkGameController(null);
+        NeuralNetworkGameController nnController = new NeuralNetworkGameController();
         Population population = new Population(100, nnController); // Example population size of 100
 
         int maxGenerations = 1000;
+        double[] fitnessValues = population.evaluateFitness();
+
+        List<NeuralNetworkGameController> parents = population.selectParents(fitnessValues);
 
         // Main loop of the genetic algorithm
-        public void runGeneticAlgorithm(int generation, Population population) {
-        	  if (generation > maxGenerations) {
-        	    return; // Base case: Reached max generations
-        	  }
+        for (int generation = 1; generation <= maxGenerations; generation++) {
 
-        	  // Evaluate fitness of individuals
-        	  double[] fitnessValues = population.evaluateFitness();
-
-        	  // Select parents for crossover
-        	  List<NeuralNetworkGameController> parents = population.selectParents(fitnessValues);
-
-        	  // Perform crossover to create offspring
-        	  List<NeuralNetworkGameController> offspring = population.crossoverAndMutation(parents);
-
-        	  // Update population with offspring
-        	  population.updatePopulation(offspring);
-
-        	  // Optionally, monitor and print statistics
-        	  System.out.println("Generation " + generation + ": Best fitness = " + population.getBestFitness());
-
-        	  // Recursive call for the next generation
-        	  runGeneticAlgorithm(generation + 1, population);
-        	}
-        BreakoutBoard bestIndividual = population.getBestIndividual();
+            // Perform crossover to create offspring
+            parents = population.crossoverAndMutation(parents);
+            
+            // Optionally, monitor and print statistics (e.g., best fitness, average fitness) for each generation
+            System.out.println("Generation " + generation + ": Best fitness = " + population.getBestFitness());       
+        }
+        NeuralNetworkGameController bestIndividual = population.getBestIndividual();
         NeuralNetworkGameController NN = population.getBestNN();
         int bestSeed = population.getSeed();
 
