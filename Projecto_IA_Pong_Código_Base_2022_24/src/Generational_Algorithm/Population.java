@@ -150,38 +150,57 @@ public class Population {
     return offspring;
   }
 
+
   private NeuralNetworkGameController crossover(NeuralNetworkGameController parent1, NeuralNetworkGameController parent2) {
 	  // Use the existing bestIndividual for initialization (assuming it has weights)
-	  NeuralNetworkGameController child = new NeuralNetworkGameController(bestIndividual); 
+	  NeuralNetworkGameController child = new NeuralNetworkGameController(bestIndividual);
 	  double[][] childHiddenWeights = child.getHiddenWeights();
 	  double[][] childOutputWeights = child.getOutputWeights();
 
-	  // Choose a random crossover point for both hidden and output weights
+	  // Choose random crossover points for hidden and output weights
 	  int hiddenCrossoverPoint = (int) (Math.random() * childHiddenWeights.length);
 	  int outputCrossoverPoint = (int) (Math.random() * childOutputWeights.length);
 
-	  // Copy weights from parent1 up to the crossover point for hidden layer
+	  // Perform single-point crossover for hidden weights
 	  for (int i = 0; i < hiddenCrossoverPoint; i++) {
-	    System.arraycopy(parent1.getHiddenWeights()[i], 0, childHiddenWeights[i], 0, parent1.getHiddenWeights()[i].length);
+	    System.arraycopy(parent1.getHiddenWeights()[i], 0, childHiddenWeights[i], 0, childHiddenWeights[i].length);
 	  }
-	  // Copy weights from parent2 after the crossover point for hidden layer
 	  for (int i = hiddenCrossoverPoint; i < childHiddenWeights.length; i++) {
-	    System.arraycopy(parent2.getHiddenWeights()[i], 0, childHiddenWeights[i], 0, parent2.getHiddenWeights()[i].length);
+	    System.arraycopy(parent2.getHiddenWeights()[i], 0, childHiddenWeights[i], 0, childHiddenWeights[i].length);
 	  }
 
-	  // Copy weights from parent1 up to the crossover point for output layer (similar logic)
+	  // Perform single-point crossover for output weights
 	  for (int i = 0; i < outputCrossoverPoint; i++) {
-	    System.arraycopy(parent1.getOutputWeights()[i], 0, childOutputWeights[i], 0, parent1.getOutputWeights()[i].length);
+	    System.arraycopy(parent1.getOutputWeights()[i], 0, childOutputWeights[i], 0, childOutputWeights[i].length);
 	  }
-	  // Copy weights from parent2 after the crossover point for output layer
 	  for (int i = outputCrossoverPoint; i < childOutputWeights.length; i++) {
-	    System.arraycopy(parent2.getOutputWeights()[i], 0, childOutputWeights[i], 0, childOutputWeights[i].length); // This was fixed from a previous typo (should be childOutputWeights[i])
+	    System.arraycopy(parent2.getOutputWeights()[i], 0, childOutputWeights[i], 0, childOutputWeights[i].length);
 	  }
 
 	  child.setHiddenWeights(childHiddenWeights);
 	  child.setOutputWeights(childOutputWeights);
+
+	  // Evaluate parent and child fitness
+	  BreakoutBoard parent1Board = new BreakoutBoard(parent1, false, this.getSeed()); // Assuming seed is accessible
+	  BreakoutBoard parent2Board = new BreakoutBoard(parent2, false, this.getSeed());
+	  BreakoutBoard childBoard = new BreakoutBoard(child, false, this.getSeed());
+
+	  parent1Board.runSimulation();
+	  parent2Board.runSimulation();
+
+	  double parent1Fitness = parent1Board.getFitness();
+	  double parent2Fitness = parent2Board.getFitness();
+	  double childFitness = childBoard.getFitness();
+	  
+	  // Print fitness values (modify formatting as needed)
+	  System.out.println("Parent 1 Fitness: " + parent1Fitness);
+	  System.out.println("Parent 2 Fitness: " + parent2Fitness);
+	  System.out.println("Child Fitness: " + childFitness);
+	  
 	  return child;
 	}
+
+
 
 
 
@@ -229,12 +248,17 @@ public class Population {
 
   public void updatePopulation(List<NeuralNetworkGameController> offspring) {
     // Remove the last (population size - elite individuals) elements from the population
-    int numElite = 2; // Assuming you want to keep the top 2 fittest individuals
-    int elementsToRemove = NeuralNetworkList.size() - numElite;
+    int numElite = 1; // Assuming you want to keep the top 2 fittest individuals
+    int elementsToRemove = numElite;
     for (int i = 0; i < elementsToRemove; i++) {
       NeuralNetworkList.remove(NeuralNetworkList.size() - 1);
     }
     // Add the new offspring to the beginning of the population
     NeuralNetworkList.addAll(0, offspring);
   }
+
+  public int getSize() {
+	  return NeuralNetworkList.size();
+	}
+
 }
