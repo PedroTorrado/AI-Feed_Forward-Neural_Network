@@ -25,19 +25,21 @@ public class GeneticAlgorithm {
 
             // Perform crossover to create offspring
             List<NeuralNetworkGameController> offspring = population.crossoverAndMutation(parents);
-
+            
             // Optionally, monitor and print statistics (e.g., best fitness, average fitness) for each generation
             System.out.println("Generation " + generation + ": Best fitness = " + population.getBestFitness());       
         }
         BreakoutBoard bestIndividual = population.getBestIndividual();
+        NeuralNetworkGameController NN = population.getBestNN();
+
         if (bestIndividual != null) {
-            visualizeResult(bestIndividual);
+            visualizeResult(NN);
         }
     }
 
     // Method to visualize the result using the Breakout game GUI
-    private static void visualizeResult(BreakoutBoard board) {
+    private static void visualizeResult(NeuralNetworkGameController NN) {
         // Create an instance of the Breakout class and pass the BreakoutBoard instance to it
-        new Breakout(new BreakoutController(), 100);
+        new Breakout(NN, 100);
     }
 }

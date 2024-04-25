@@ -10,18 +10,21 @@ public class Population {
     private List<BreakoutBoard> breakoutBoardList;
     private BreakoutBoard bestIndividual;
     private double bestFitness;
+    private int seed;
 
     public Population(int size, NeuralNetworkGameController nnController) {
         breakoutBoardList = new ArrayList<>();
         initializePopulation(size, nnController);
         bestIndividual = null;
         bestFitness = Double.MIN_VALUE;
+        seed = this.seed;
     }
 
     private void initializePopulation(int size, NeuralNetworkGameController nnController) {
         for (int i = 0; i < size; i++) {
             // Creating breakout boards with random seeds
-            BreakoutBoard agent = new BreakoutBoard(nnController, false, (int) (System.currentTimeMillis() * 1000));
+        	seed = (int) (Math.random()*10000000);
+            BreakoutBoard agent = new BreakoutBoard(nnController, false, seed);
             breakoutBoardList.add(agent);
         }
     }
@@ -35,6 +38,9 @@ public class Population {
             double fitness = breakoutBoard.getFitness();
             fitnessValues[i] = fitness;
 
+            // Debugging: Print fitness values for each agent
+            //System.out.println("Agent " + i + " Fitness: " + fitness);
+
             // Update best individual and its fitness
             if (fitness > bestFitness) {
                 bestFitness = fitness;
@@ -42,8 +48,12 @@ public class Population {
             }
         }
 
+        // Debugging: Print best fitness
+        //System.out.println("Best Fitness: " + bestFitness);
+
         return fitnessValues;
     }
+
 
     public List<NeuralNetworkGameController> selectParents(double[] fitnessValues) {
         List<NeuralNetworkGameController> parents = new ArrayList<>();
@@ -132,8 +142,21 @@ public class Population {
     public BreakoutBoard getBestIndividual() {
         return bestIndividual;
     }
+    
+    public NeuralNetworkGameController getBestNN() {
+    	  // Check if the bestIndividual is set, otherwise return null
+    	  if (bestIndividual != null) {
+    	    return new NeuralNetworkGameController(bestIndividual);
+    	  } else {
+    	    return null;
+    	  }
+    	}
 
     public double getBestFitness() {
         return bestFitness;
+    }
+    
+    public int getSeed() {
+    	return this.seed;
     }
 }
