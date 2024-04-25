@@ -30,29 +30,38 @@ public class Population {
     }
 
     public double[] evaluateFitness() {
-        double[] fitnessValues = new double[breakoutBoardList.size()];
+    	  double[] fitnessValues = new double[breakoutBoardList.size()];
 
-        for (int i = 0; i < breakoutBoardList.size(); i++) {
-            BreakoutBoard breakoutBoard = breakoutBoardList.get(i);
-            breakoutBoard.runSimulation();
-            double fitness = breakoutBoard.getFitness();
-            fitnessValues[i] = fitness;
+    	  for (int i = 0; i < breakoutBoardList.size(); i++) {
+    	    BreakoutBoard breakoutBoard = breakoutBoardList.get(i);
+    	    breakoutBoard.runSimulation();
+    	    double fitness = breakoutBoard.getFitness();
+    	    fitnessValues[i] = fitness;
 
-            // Debugging: Print fitness values for each agent
-            //System.out.println("Agent " + i + " Fitness: " + fitness);
+    	    // Update best individual and its fitness
+    	    if (fitness > bestFitness) {
+    	      bestFitness = fitness;
+    	      bestIndividual = breakoutBoard;
+    	    }
+    	  }
 
-            // Update best individual and its fitness
-            if (fitness > bestFitness) {
-                bestFitness = fitness;
-                bestIndividual = breakoutBoard;
-            }
-        }
+    	  // Identify top 'e' fittest individuals (adjust 'e')
+    	  int numElite = 2;
+    	  List<BreakoutBoard> bestFromPreviousGen = new ArrayList<>(breakoutBoardList.subList(0, numElite));
 
-        // Debugging: Print best fitness
-        //System.out.println("Best Fitness: " + bestFitness);
+    	  // Add elite individuals to the beginning of the breakoutBoardList
+    	  breakoutBoardList.addAll(0, bestFromPreviousGen);
 
-        return fitnessValues;
-    }
+    	  // Calculate average fitness
+    	  double totalFitness = 0;
+    	  for (double fitness : fitnessValues) {
+    	    totalFitness += fitness;
+    	  }
+    	  double averageFitness = totalFitness / fitnessValues.length;
+
+    	  return fitnessValues;
+	}
+
 
 
     public List<NeuralNetworkGameController> selectParents(double[] fitnessValues) {
@@ -110,13 +119,40 @@ public class Population {
         return offspring;
     }
 
+    private NeuralNetworkGameController crossover(NeuralNetworkGameController parent1, NeuralNetworkGameController parent2) {
+    	  NeuralNetworkGameController child = new NeuralNetworkGameController(bestIndividual);  // Use existing bestIndividual for initialization
+    	  double[][] childHiddenWeights = child.getHiddenWeights();
+    	  double[][] childOutputWeights = child.getOutputWeights();
 
-    private NeuralNetworkGameController crossover(NeuralNetworkGameController p1, NeuralNetworkGameController p2) {
-        NeuralNetworkGameController child = new NeuralNetworkGameController(bestIndividual);
-        child.setHiddenWeights(p2.getHiddenWeights());
-        child.setOutputWeights(p2.getOutputWeights());
-        return child;
-    }
+    	  // Choose a random crossover point for both hidden and output weights
+    	  int hiddenCrossoverPoint = (int) (Math.random() * childHiddenWeights.length);
+    	  int outputCrossoverPoint = (int) (Math.random() * childOutputWeights.length);
+
+    	  // Copy weights from parent1 up to the crossover point for hidden layer
+    	  for (int i = 0; i < hiddenCrossoverPoint; i++) {
+    	    System.arraycopy(parent1.getHiddenWeights()[i], 0, childHiddenWeights[i], 0, parent1.getHiddenWeights()[i].length);
+    	  }
+    	  // Copy weights from parent2 after the crossover point for hidden layer
+    	  for (int i = hiddenCrossoverPoint; i < childHiddenWeights.length; i++) {
+    	    System.arraycopy(parent2.getHiddenWeights()[i], 0, childHiddenWeights[i], 0, parent2.getHiddenWeights()[i].length);
+    	  }
+
+    	  // Copy weights from parent1 up to the crossover point for output layer (similar logic)
+    	  for (int i = 0; i < outputCrossoverPoint; i++) {
+    	    System.arraycopy(parent1.getOutputWeights()[i], 0, childOutputWeights[i], 0, parent1.getOutputWeights()[i].length);
+    	  }
+    	  // Copy weights from parent2 after the crossover point for output layer
+    	  for (int i = outputCrossoverPoint; i < childOutputWeights.length; i++) {
+    	    System.arraycopy(parent2.getHiddenWeights()[i], 0, childOutputWeights[i], 0, parent2.getHiddenWeights()[i].length);  // This line also had a typo, it should be childOutputWeights[i]
+    	  }
+
+    	  child.setHiddenWeights(childHiddenWeights);
+    	  child.setOutputWeights(childOutputWeights);
+    	  return child;
+    	}
+
+
+
 
     private void mutation(NeuralNetworkGameController child) {
         double mutationRate = 0.05; // Adjust as needed

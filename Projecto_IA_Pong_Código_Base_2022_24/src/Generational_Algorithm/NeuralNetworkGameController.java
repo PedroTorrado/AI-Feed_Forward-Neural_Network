@@ -23,29 +23,31 @@ public class NeuralNetworkGameController implements GameController {
     }
 
     private void initializeParameters() {
-        hiddenWeights = new double[inputDim][hiddenDim];
-        hiddenBiases = new double[hiddenDim];
-        outputWeights = new double[hiddenDim][outputDim];
-        outputBiases = new double[outputDim];
+    	  hiddenWeights = new double[inputDim][hiddenDim];
+    	  hiddenBiases = new double[hiddenDim];
+    	  outputWeights = new double[hiddenDim][outputDim];
+    	  outputBiases = new double[outputDim];
 
-        // Initialize weights and biases with random values
-        for (int i = 0; i < inputDim; i++) {
-            for (int j = 0; j < hiddenDim; j++) {
-                hiddenWeights[i][j] = Math.random() * 100;
-            }
-        }
-        for (int i = 0; i < hiddenDim; i++) {
-            hiddenBiases[i] = Math.random() * 100;
-        }
-        for (int i = 0; i < hiddenDim; i++) {
-            for (int j = 0; j < outputDim; j++) {
-                outputWeights[i][j] = Math.random() * 100;
-            }
-        }
-        for (int i = 0; i < outputDim; i++) {
-            outputBiases[i] = Math.random() * 100;
-        }
-    }
+    	  // Initialize biases for hidden layer with a small positive value
+    	  for (int i = 0; i < hiddenDim; i++) {
+    	    hiddenBiases[i] = 0.1;
+    	  }
+
+    	  // Glorot initialization for weights
+    	  double weightScale = Math.sqrt(2.0 / (inputDim + hiddenDim));
+    	  for (int i = 0; i < inputDim; i++) {
+    	    for (int j = 0; j < hiddenDim; j++) {
+    	      hiddenWeights[i][j] = Math.random() * weightScale * 2 - weightScale;
+    	    }
+    	  }
+
+    	  weightScale = Math.sqrt(2.0 / (hiddenDim + outputDim));
+    	  for (int i = 0; i < hiddenDim; i++) {
+    	    for (int j = 0; j < outputDim; j++) {
+    	      outputWeights[i][j] = Math.random() * weightScale * 2 - weightScale;
+    	    }
+    	  }
+    	}
 
     public int nextMove(int[] currentState) {
         double[] hiddenLayer = new double[hiddenDim];

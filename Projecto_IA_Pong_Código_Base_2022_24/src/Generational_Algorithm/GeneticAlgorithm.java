@@ -16,30 +16,41 @@ public class GeneticAlgorithm {
         int maxGenerations = 1000;
 
         // Main loop of the genetic algorithm
-        for (int generation = 1; generation <= maxGenerations; generation++) {
-            // Evaluate fitness of individuals in the population
-            double[] fitnessValues = population.evaluateFitness();
+        public void runGeneticAlgorithm(int generation, Population population) {
+        	  if (generation > maxGenerations) {
+        	    return; // Base case: Reached max generations
+        	  }
 
-            // Select parents for crossover
-            List<NeuralNetworkGameController> parents = population.selectParents(fitnessValues);
+        	  // Evaluate fitness of individuals
+        	  double[] fitnessValues = population.evaluateFitness();
 
-            // Perform crossover to create offspring
-            List<NeuralNetworkGameController> offspring = population.crossoverAndMutation(parents);
-            
-            // Optionally, monitor and print statistics (e.g., best fitness, average fitness) for each generation
-            System.out.println("Generation " + generation + ": Best fitness = " + population.getBestFitness());       
-        }
+        	  // Select parents for crossover
+        	  List<NeuralNetworkGameController> parents = population.selectParents(fitnessValues);
+
+        	  // Perform crossover to create offspring
+        	  List<NeuralNetworkGameController> offspring = population.crossoverAndMutation(parents);
+
+        	  // Update population with offspring
+        	  population.updatePopulation(offspring);
+
+        	  // Optionally, monitor and print statistics
+        	  System.out.println("Generation " + generation + ": Best fitness = " + population.getBestFitness());
+
+        	  // Recursive call for the next generation
+        	  runGeneticAlgorithm(generation + 1, population);
+        	}
         BreakoutBoard bestIndividual = population.getBestIndividual();
         NeuralNetworkGameController NN = population.getBestNN();
+        int bestSeed = population.getSeed();
 
         if (bestIndividual != null) {
-            visualizeResult(NN);
+            visualizeResult(NN, bestSeed);
         }
     }
 
     // Method to visualize the result using the Breakout game GUI
-    private static void visualizeResult(NeuralNetworkGameController NN) {
+    private static void visualizeResult(NeuralNetworkGameController NN, int seed) {
         // Create an instance of the Breakout class and pass the BreakoutBoard instance to it
-        new Breakout(NN, 100);
+        new Breakout(NN, seed);
     }
 }
