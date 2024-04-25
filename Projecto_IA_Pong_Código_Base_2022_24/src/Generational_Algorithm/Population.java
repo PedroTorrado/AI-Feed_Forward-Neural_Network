@@ -1,7 +1,6 @@
 package Generational_Algorithm;
 
 import breakout.BreakoutBoard;
-import utils.GameController;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -110,19 +109,21 @@ public class Population {
     }
 
     private void mutation(NeuralNetworkGameController child) {
-        double mutationRate = 1; // Adjust as needed
+        double mutationRate = 0.05; // Adjust as needed
+        double[][] childHiddenWeights = child.getHiddenWeights();
+        double[][] childOutputWeights = child.getOutputWeights();
 
-        for (int i = 0; i < child.hiddenWeights.length; i++) {
-            for (int j = 0; j < child.hiddenWeights[i].length; j++) {
+        for (int i = 0; i < childHiddenWeights.length; i++) {
+            for (int j = 0; j < childHiddenWeights[i].length; j++) {
                 if (Math.random() < mutationRate) {
-                    child.hiddenWeights[i][j] += (Math.random() * 0.5) + 0.1;
+                	childHiddenWeights[i][j] += (Math.random() * 0.5) + 0.1;
                 }
             }
         }
-        for (int i = 0; i < child.outputWeights.length; i++) {
-            for (int j = 0; j < child.outputWeights[i].length; j++) {
+        for (int i = 0; i < childOutputWeights.length; i++) {
+            for (int j = 0; j < childOutputWeights[i].length; j++) {
                 if (Math.random() < mutationRate) {
-                    child.outputWeights[i][j] += (Math.random() * 0.5) + 0.1;
+                	childOutputWeights[i][j] += (Math.random() * 0.5) + 0.1;
                 }
             }
         }

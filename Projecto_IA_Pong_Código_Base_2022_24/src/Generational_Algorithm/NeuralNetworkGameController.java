@@ -10,14 +10,14 @@ public class NeuralNetworkGameController implements GameController {
     private int hiddenDim;
     private int outputDim;
 
-    double[][] hiddenWeights;
+    private double[][] hiddenWeights;
     private double[] hiddenBiases;
-    double[][] outputWeights;
+    private double[][] outputWeights;
     private double[] outputBiases;
 
     public NeuralNetworkGameController(BreakoutBoard breakoutBoard) {
         this.inputDim = Commons.BREAKOUT_STATE_SIZE;
-        this.hiddenDim = 10; // Example value, adjust as needed
+        this.hiddenDim = 1; // Example value, adjust as needed
         this.outputDim = Commons.BREAKOUT_NUM_ACTIONS;
         initializeParameters();
     }
@@ -31,19 +31,19 @@ public class NeuralNetworkGameController implements GameController {
         // Initialize weights and biases with random values
         for (int i = 0; i < inputDim; i++) {
             for (int j = 0; j < hiddenDim; j++) {
-                hiddenWeights[i][j] = Math.random() * 10;
+                hiddenWeights[i][j] = Math.random() * 100;
             }
         }
         for (int i = 0; i < hiddenDim; i++) {
-            hiddenBiases[i] = Math.random() * 10;
+            hiddenBiases[i] = Math.random() * 100;
         }
         for (int i = 0; i < hiddenDim; i++) {
             for (int j = 0; j < outputDim; j++) {
-                outputWeights[i][j] = Math.random() * 10;
+                outputWeights[i][j] = Math.random() * 100;
             }
         }
         for (int i = 0; i < outputDim; i++) {
-            outputBiases[i] = Math.random() * 10;
+            outputBiases[i] = Math.random() * 100;
         }
     }
 
