@@ -105,69 +105,67 @@ public class Population {
 	}
 
 	public List<NeuralNetworkGameController> selectParents(double[] fitnessValues) {
-		  List<NeuralNetworkGameController> parents = new ArrayList<>();
-		  int numParents = 2; // Number of parents to select
+		List<NeuralNetworkGameController> parents = new ArrayList<>();
+		int numParents = 2; // Number of parents to select
 
-		  // Find top 10 fittest individuals:
-		  List<RankedAgent> topFitness = new ArrayList<>();
-		  for (int i = 0; i < fitnessValues.length; i++) {
-		    RankedAgent agent = new RankedAgent(fitnessValues[i], NeuralNetworkList.get(i));
-		    
-		    // Insert based on fitness (maintain top 10)
-		    if (topFitness.size() < 10) {
-		      topFitness.add(agent);
-		    } else {
-		      RankedAgent lowest = topFitness.get(topFitness.size() - 1);
-		      if (agent.fitness > lowest.fitness) {
-		        topFitness.remove(lowest);
-		        topFitness.add(agent);
-		      }
+		// Find the 2 best parents based on fitness:
+		int bestIndex1 = -1, bestIndex2 = -1; // Indexes of the best parents
+		double bestFitness1 = Double.NEGATIVE_INFINITY, bestFitness2 = Double.NEGATIVE_INFINITY;
+
+		fitnessValues = filterFitnessValues(fitnessValues, 99259);
+		
+		// Find the 2 best agents (assuming NeuralNetworkList provides access to
+		// NeuralNetworkGameController objects):
+		for (int i = 0; i < fitnessValues.length; i++) {
+			if (fitnessValues[i] > bestFitness1) { // Check for strictly greater than
+				bestFitness2 = bestFitness1;
+				bestIndex2 = bestIndex1;
+
+				bestFitness1 = fitnessValues[i];
+				bestIndex1 = i;
+			} else if (fitnessValues[i] > bestFitness2 && fitnessValues[i] != bestFitness1) { // Ensure not the same
+																								// fitness value
+				bestFitness2 = fitnessValues[i];
+				bestIndex2 = i;
+			}
+		}
+
+		// Check if any valid parents were found:
+		if (bestIndex1 == -1 || bestIndex2 == -1) {
+			System.err.println(
+					"Error: No valid parents found with distinct fitness values. Consider adjusting fitness values.");
+			return parents;
+		}
+
+		// Add the best 2 parents to the list (assuming NeuralNetworkList provides
+		// access):
+		parents.add(NeuralNetworkList.get(bestIndex1));
+		parents.add(NeuralNetworkList.get(bestIndex2));
+
+		return parents;
+	}
+
+	public double[] filterFitnessValues(double[] fitnessValues, double threshold) {
+		  // Create a new array to store the filtered fitness values
+		  int filteredCount = 0; // Keep track of the number of elements above the threshold
+		  for (double fitness : fitnessValues) {
+		    if (fitness > threshold) {
+		      filteredCount++;
 		    }
 		  }
 
-		  // Check if any elements remain after filtering
-		  if (topFitness.isEmpty()) {
-		    System.err.println("Warning: All fitness values below threshold. Consider adjusting selection method.");
-		    // Handle the case where no elements meet the threshold (e.g., return empty list or random selection)
-		    return parents;
-		  }
+		  double[] filteredFitness = new double[filteredCount]; // Allocate correct size
+		  int j = 0; // Index for the filtered array
 
-		  // Roulette wheel selection (unchanged):
-		  double totalFitness = 0;
-		  List<RankedAgent> rouletteCandidates = new ArrayList<>(topFitness); // Convert to a list for roulette selection
-
-		  // Calculate total fitness of top 10
-		  for (RankedAgent agent : rouletteCandidates) {
-		    totalFitness += agent.fitness;
-		  }
-
-		  // Perform roulette wheel selection twice (for 2 parents)
-		  for (int i = 0; i < numParents; i++) {
-		    double randomValue = Math.random() * totalFitness;
-		    double partialSum = 0;
-		    for (RankedAgent agent : rouletteCandidates) {
-		      partialSum += agent.fitness;
-		      if (partialSum >= randomValue) {
-		        parents.add(agent.agent);
-		        break;
-		      }
+		  // Populate the filtered array with elements exceeding the threshold
+		  for (double fitness : fitnessValues) {
+		    if (fitness > threshold) {
+		      filteredFitness[j++] = fitness;
 		    }
 		  }
 
-		  return parents;
+		  return filteredFitness;
 		}
-
-		// Helper class to store agent and its fitness
-		private static class RankedAgent {
-		  double fitness;
-		  NeuralNetworkGameController agent;
-
-		  public RankedAgent(double fitness, NeuralNetworkGameController agent) {
-		    this.fitness = fitness;
-		    this.agent = agent;
-		  }
-		}
-
 
 	public List<NeuralNetworkGameController> crossoverAndMutation(List<NeuralNetworkGameController> parents) {
 		List<NeuralNetworkGameController> offspring = new ArrayList<>();
@@ -203,11 +201,9 @@ public class Population {
 		parent1Game.runSimulation();
 		parent2Game.runSimulation();
 
-		System.out.println("Parent 1 Fitness: " + parent1Game.getFitness()); // Replace with your fitness evaluation
-																				// function
-		System.out.println("Parent 2 Fitness: " + parent2Game.getFitness()); // Replace with your fitness evaluation
-																				// function
-
+		System.out.println("Parent 1 Fitness: " + parent1Game.getFitness()); 
+		System.out.println("Parent 2 Fitness: " + parent2Game.getFitness()); 
+		
 		// Create a new child network with the same structure as parents
 		NeuralNetworkGameController child = parent1; // Ensure correct number of layers for child
 

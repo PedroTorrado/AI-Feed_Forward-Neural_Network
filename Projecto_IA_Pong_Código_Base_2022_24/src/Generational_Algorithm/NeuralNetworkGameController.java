@@ -199,4 +199,6 @@ public class NeuralNetworkGameController implements GameController {
 		}
 		return this.hiddenWeights; // Return the entire inner array for the specified layer
 	}
+	
+	
 }
