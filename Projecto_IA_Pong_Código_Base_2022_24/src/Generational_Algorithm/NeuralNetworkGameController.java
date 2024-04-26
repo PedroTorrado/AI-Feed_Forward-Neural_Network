@@ -10,9 +10,9 @@ public class NeuralNetworkGameController implements GameController {
   private int hiddenDim;
   private int outputDim;
 
-  private double[][] hiddenWeights;
+  double[][] hiddenWeights;
   private double[] hiddenBiases;
-  private double[][] outputWeights;
+  double[][] outputWeights;
   private double[] outputBiases;
 
   public NeuralNetworkGameController() {
@@ -83,11 +83,6 @@ public class NeuralNetworkGameController implements GameController {
     return 1 / (1 + Math.exp(-x));
   }
 
-  // Getter and setter methods for hiddenWeights
-  public double[][] getHiddenWeights() {
-    return hiddenWeights;
-  }
-
   public void setHiddenWeights(double[][] hiddenWeights) {
     this.hiddenWeights = hiddenWeights;
   }
@@ -96,10 +91,10 @@ public class NeuralNetworkGameController implements GameController {
   public double[][] getOutputWeights() {
     return outputWeights;
   }
+  public double[][] setOutputWeights(int layer) {
+	  return this.outputWeights;
+	}
 
-  public void setOutputWeights(double[][] outputWeights) {
-    this.outputWeights = outputWeights;
-  }
 
   public NeuralNetworkGameController(NeuralNetworkGameController other) {
     // Deep copy hidden and output weights
@@ -146,4 +141,63 @@ public class NeuralNetworkGameController implements GameController {
 	public int getOutputSize() {
 		return outputDim;
 	}
+	public void setWeights(int layer, double[][] weights) {
+		  if (layer >= 0 && layer < this.getNumLayers()) {
+		    // Check for valid layer index
+		    if (layer == this.getNumLayers() - 1) {
+		      // Assuming weights are for the output layer (modify if using for hidden layers)
+		      this.outputWeights = weights;
+		    } else {
+		      // Otherwise, assign to hidden weights
+		      this.hiddenWeights = weights;
+		    }
+		  } else {
+		    throw new IllegalArgumentException("Invalid layer index: " + layer);
+		  }
+		}
+
+
+		public double[] getBiases(int layer) {
+		  if (layer >= 0 && layer < this.getNumLayers()) {
+		    // Check for valid layer index
+		    if (layer == this.getNumLayers() - 1) {
+		      // Assuming biases are for hidden layers, return hidden biases for the last layer
+		      return this.hiddenBiases;
+		    } else {
+		      // Otherwise, return hidden biases
+		      return this.hiddenBiases; // Modify to return output biases if using output biases
+		    }
+		  } else {
+		    throw new IllegalArgumentException("Invalid layer index: " + layer);
+		  }
+		}
+
+		public void setBiases(int layer, double[] biases) {
+		  if (layer >= 0 && layer < this.getNumLayers()) {
+		    // Check for valid layer index
+		    if (layer == this.getNumLayers() - 1) {
+		      // Assuming biases are for hidden layers, set hidden biases for the last layer
+		      this.hiddenBiases = biases;
+		    } else {
+		      // Otherwise, set hidden biases
+		      this.hiddenBiases = biases; // Modify to set output biases if using output biases
+		    }
+		  } else {
+		    throw new IllegalArgumentException("Invalid layer index: " + layer);
+		  }
+		}
+
+		public int getNumLayers() {
+		  // Assuming there are two hidden layers (input + hidden + output)
+		  return 2 + 1; // Modify if the network structure differs
+		}
+		public double[][] getWeights(int layer) {
+			  if (layer < 0 || layer >= this.hiddenWeights.length) {
+			    throw new IllegalArgumentException("Invalid layer index: " + layer);
+			  }
+			  return this.hiddenWeights; // Return the entire inner array for the specified layer
+			}
+
+
+
 }

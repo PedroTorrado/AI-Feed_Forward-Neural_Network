@@ -33,7 +33,7 @@ public class GeneticAlgorithm {
       population.updatePopulation(offspring);
 
       // Print population size after update for monitoring
-      System.out.println("Population size after update: " + population.getSize());
+      //System.out.println("Population size after update: " + population.getSize());
 
       // Check for empty population (optional) - handle if necessary
       if (population.getSize() == 0) {

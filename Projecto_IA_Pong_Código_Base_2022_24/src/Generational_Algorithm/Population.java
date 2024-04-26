@@ -10,7 +10,7 @@ public class Population {
   private List<NeuralNetworkGameController> NeuralNetworkList;
   private NeuralNetworkGameController bestIndividual;
   private double bestFitness;
-  private int seed;
+  private static int seed;
 
   public Population(int size, NeuralNetworkGameController nnController) {
 	NeuralNetworkList = new ArrayList<>();
@@ -27,8 +27,8 @@ public class Population {
 	        // Assuming NeuralNetworkGameController has constructors for network size
 	        NeuralNetworkGameController agent = new NeuralNetworkGameController();
 	        // Access weight and bias arrays from agent (assuming appropriate getter/setter methods)
-	        double[][] hiddenWeights = agent.getHiddenWeights();
-	        double[][] outputWeights = agent.getOutputWeights();
+	        double[][] hiddenWeights = agent.hiddenWeights;
+	        double[][] outputWeights = agent.outputWeights;
 	        double[] hiddenBiases = agent.getHiddenBiases(); 	
 	        double[] outputBiases = agent.getOutputBiases();
 
@@ -141,89 +141,85 @@ public class Population {
       NeuralNetworkGameController parent1 = parents.get(i);
       NeuralNetworkGameController parent2 = parents.get(i + 1);
 
-      NeuralNetworkGameController child = crossover(parent1, parent2);
-      mutation(child);
+      NeuralNetworkGameController child1 = crossover(parent1, parent2);
+      NeuralNetworkGameController child2 = crossover(parent2, parent1);
+      mutation(child1);
+      mutation(child2);
 
-      offspring.add(child);
+      offspring.add(child1);
+      offspring.add(child2);
     }
 
     return offspring;
   }
 
+  public static NeuralNetworkGameController crossover(NeuralNetworkGameController parent1, NeuralNetworkGameController parent2) {
 
-  private NeuralNetworkGameController crossover(NeuralNetworkGameController parent1, NeuralNetworkGameController parent2) {
-	  // Use the existing bestIndividual for initialization (assuming it has weights)
-	  NeuralNetworkGameController child = new NeuralNetworkGameController(bestIndividual);
-	  double[][] childHiddenWeights = child.getHiddenWeights();
-	  double[][] childOutputWeights = child.getOutputWeights();
+	  // Select a random crossover point (excluding the first and last layers)
+	  int crossoverPoint = (int) (Math.random() * (parent1.getNumLayers() - 2)) + 1;
 
-	  // Choose random crossover points for hidden and output weights
-	  int hiddenCrossoverPoint = (int) (Math.random() * childHiddenWeights.length);
-	  int outputCrossoverPoint = (int) (Math.random() * childOutputWeights.length);
-
-	  // Perform single-point crossover for hidden weights
-	  for (int i = 0; i < hiddenCrossoverPoint; i++) {
-	    System.arraycopy(parent1.getHiddenWeights()[i], 0, childHiddenWeights[i], 0, childHiddenWeights[i].length);
-	  }
-	  for (int i = hiddenCrossoverPoint; i < childHiddenWeights.length; i++) {
-	    System.arraycopy(parent2.getHiddenWeights()[i], 0, childHiddenWeights[i], 0, childHiddenWeights[i].length);
-	  }
-
-	  // Perform single-point crossover for output weights
-	  for (int i = 0; i < outputCrossoverPoint; i++) {
-	    System.arraycopy(parent1.getOutputWeights()[i], 0, childOutputWeights[i], 0, childOutputWeights[i].length);
-	  }
-	  for (int i = outputCrossoverPoint; i < childOutputWeights.length; i++) {
-	    System.arraycopy(parent2.getOutputWeights()[i], 0, childOutputWeights[i], 0, childOutputWeights[i].length);
-	  }
-
-	  child.setHiddenWeights(childHiddenWeights);
-	  child.setOutputWeights(childOutputWeights);
-
-	  // Evaluate parent and child fitness
-	  BreakoutBoard parent1Board = new BreakoutBoard(parent1, false, this.getSeed()); // Assuming seed is accessible
-	  BreakoutBoard parent2Board = new BreakoutBoard(parent2, false, this.getSeed());
-	  BreakoutBoard childBoard = new BreakoutBoard(child, false, this.getSeed());
-
-	  parent1Board.runSimulation();
-	  parent2Board.runSimulation();
-
-	  double parent1Fitness = parent1Board.getFitness();
-	  double parent2Fitness = parent2Board.getFitness();
-	  double childFitness = childBoard.getFitness();
+	  System.out.println("----- Crossover Details -----");
+	  System.out.println("Parent 1 Layers: " + parent1.getNumLayers());
+	  System.out.println("Parent 2 Layers: " + parent2.getNumLayers());
 	  
-	  // Print fitness values (modify formatting as needed)
-	  System.out.println("Parent 1 Fitness: " + parent1Fitness);
-	  System.out.println("Parent 2 Fitness: " + parent2Fitness);
-	  System.out.println("Child Fitness: " + childFitness);
+	  BreakoutBoard parent1Game = new BreakoutBoard(parent1, false, seed); // Set appropriate parameters for parent1Game
+	  BreakoutBoard parent2Game = new BreakoutBoard(parent2, false, seed); // Set appropriate parameters for parent2Game
 	  
+	  parent1Game.runSimulation();
+	  parent2Game.runSimulation();
+	  
+	  System.out.println("Parent 1 Fitness: " + parent1Game.getFitness()); // Replace with your fitness evaluation function
+	  System.out.println("Parent 2 Fitness: " + parent2Game.getFitness()); // Replace with your fitness evaluation function
+
+	  // Create a new child network with the same structure as parents
+	  NeuralNetworkGameController child = new NeuralNetworkGameController(); // Ensure correct number of layers for child
+
+	  // Copy weights from parent1 up to the crossover point (exclusive)
+	  for (int layer = 0; layer < crossoverPoint; layer++) {
+	    double[][] weights = parent1.getWeights(layer);
+	    double[] biases = parent1.getBiases(layer);
+	    System.out.println("Copying weights for layer: " + layer); // Debugging print
+	    child.setWeights(layer, weights);
+	    child.setBiases(layer, biases);
+	  }
+
+	  // Copy weights from parent2 starting from the crossover point (inclusive)
+	  for (int layer = crossoverPoint; layer < child.getNumLayers(); layer++) {
+	    double[][] weights = parent2.getWeights(layer);
+	    double[] biases = parent2.getBiases(layer);
+	    System.out.println("Copying weights for layer: " + layer); // Debugging print
+	    child.setWeights(layer, weights);
+	    child.setBiases(layer, biases);
+	  }
+	  
+	  BreakoutBoard childGame = new BreakoutBoard(child, false, seed); // Set appropriate parameters for childGame
+	  childGame.runSimulation();
+
+	  System.out.println("Child Fitness: " + childGame.getFitness()); // Replace with your fitness evaluation function
+
 	  return child;
 	}
 
-
-
-
-
   private void mutation(NeuralNetworkGameController child) {
-    double mutationRate = 0.05; // Adjust as needed
-    double[][] childHiddenWeights = child.getHiddenWeights();
-    double[][] childOutputWeights = child.getOutputWeights();
+	  double mutationRate = 0.05; // Adjust as needed
+	  
+	  for (int i = 0; i < child.hiddenWeights.length; i++) {
+	    for (int j = 0; j < child.hiddenWeights[i].length; j++) {
+	      if (Math.random() < mutationRate) {
+	        child.hiddenWeights[i][j] += (Math.random() * 0.5) - 0.25; // Adjust range and offset as needed
+	      }
+	    }
+	  }
+	  
+	  for (int i = 0; i < child.outputWeights.length; i++) {
+	    for (int j = 0; j < child.outputWeights[i].length; j++) {
+	      if (Math.random() < mutationRate) {
+	        child.outputWeights[i][j] += (Math.random() * 0.5) - 0.25; // Adjust range and offset as needed
+	      }
+	    }
+	  }
+	}
 
-    for (int i = 0; i < childHiddenWeights.length; i++) {
-      for (int j = 0; j < childHiddenWeights[i].length; j++) {
-        if (Math.random() < mutationRate) {
-          childHiddenWeights[i][j] += (Math.random() * 0.5) + 0.1;
-        }
-      }
-    }
-    for (int i = 0; i < childOutputWeights.length; i++) {
-      for (int j = 0; j < childOutputWeights[i].length; j++) {
-        if (Math.random() < mutationRate) {
-          childOutputWeights[i][j] += (Math.random() * 0.5) + 0.1;
-        }
-      }
-    }
-  }
 
   public NeuralNetworkGameController getBestIndividual() {
     return bestIndividual;
