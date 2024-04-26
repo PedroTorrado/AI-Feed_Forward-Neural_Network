@@ -20,7 +20,7 @@ public class Breakout extends JFrame {
 		pack();
 		setVisible(true);
 	}
-	
+
 	public static void main(String[] args) {
 		Breakout b = new Breakout(new BreakoutController(), 100);
 	}

@@ -8,7 +8,7 @@ public class GeneticAlgorithm {
 
   public static void main(String[] args) {
     // Initialize the population size (adjust as needed)
-    int populationSize = 1000;
+    int populationSize = 10000;
 
     // Create an instance of NeuralNetworkGameController (assuming it defines the network)
     NeuralNetworkGameController nnController = new NeuralNetworkGameController();
@@ -38,10 +38,10 @@ public class GeneticAlgorithm {
       // Check for empty population (optional) - handle if necessary
       if (population.getSize() == 0) {
         System.err.println("Error: Population is empty after update!");
-        // Implement logic to handle empty population (e.g., terminate, reset)
       }
       
       System.out.println("Generation: " + generation + " Best Fitness: " + population.getBestFitness());
+
     }
 
     // Retrieve the best individual after evolution
