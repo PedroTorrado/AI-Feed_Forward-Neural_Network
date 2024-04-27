@@ -19,7 +19,7 @@ public class GeneticAlgorithm {
 		double[] fitnessValues = population.evaluateFitness();
 
 		// Select parents based on fitness (modify `selectParents` if needed)
-		List<NeuralNetworkGameController> parents = population.selectParents(fitnessValues);
+		List<NeuralNetworkGameController> parents = population.selectParents(fitnessValues, 10);
 
 		// Set the maximum number of generations for evolution
 		int maxGenerations = 1000;
@@ -34,9 +34,6 @@ public class GeneticAlgorithm {
 				best1st = population.getBestFitness();
 			}
 
-			// Update the population with the new offspring (implement in Population)
-			population.updatePopulation(offspring);
-
 			// Print population size after update for monitoring
 			// System.out.println("Population size after update: " + population.getSize());
 
@@ -48,7 +45,7 @@ public class GeneticAlgorithm {
 			System.out.println("Generation: " + generation + " Best Fitness: " + population.getBestFitness());
 
 			// Update parent selection
-			parents = population.selectParents(fitnessValues);
+			parents = population.selectParents(fitnessValues, 10);
 		}
 
 		// Retrieve the best individual after evolution

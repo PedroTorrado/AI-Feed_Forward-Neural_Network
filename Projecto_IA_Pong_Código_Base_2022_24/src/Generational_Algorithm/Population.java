@@ -104,53 +104,27 @@ public class Population {
 		return fitnessValues;
 	}
 
-	public List<NeuralNetworkGameController> selectParents(double[] fitnessValues) {
+	public List<NeuralNetworkGameController> selectParents(double[] fitnessValues, int tournamentSize) {
 		List<NeuralNetworkGameController> parents = new ArrayList<>();
+
 		int numParents = 2; // Assuming you want to select 2 parents
 
-		// Validate input
-		if (fitnessValues.length == 0) {
-			throw new IllegalArgumentException("fitnessValues cannot be empty");
-		}
-
-		// Calculate total fitness
-		double totalFitness = 0.0;
-		for (double fitness : fitnessValues) {
-			totalFitness += Math.max(fitness, 0); // Avoid negative fitness causing issues LIMITE
-		}
-
-		// Select parents using fitness proportionate selection
 		for (int i = 0; i < numParents; i++) {
-			double rouletteWheelPosition = Math.random() * totalFitness;
-			double accumulatedFitness = 0.0;
-
-			// Find the first individual whose fitness puts us past the roulette wheel
-			// position
-			for (int j = 0; j < fitnessValues.length; j++) {
-				accumulatedFitness += Math.max(fitnessValues[j], 0.0);
-				if (accumulatedFitness >= rouletteWheelPosition) {
-					parents.add(null); // Placeholder for individual
-					break;
-				}
+			// Randomly select individuals for the tournament
+			int[] tournamentIndices = new int[tournamentSize];
+			for (int j = 0; j < tournamentSize; j++) {
+				tournamentIndices[j] = (int) (Math.random() * fitnessValues.length);
 			}
-		}
 
-		// Replace placeholders with actual individuals from the population
-		for (int i = 0; i < parents.size(); i++) {
-			int selectedIndex = -1;
-			double accumulatedFitness = 0.0;
-			double rouletteWheelPosition = Math.random() * totalFitness;
-
-			// Find the corresponding individual based on the roulette wheel position
-			for (int j = 0; j < fitnessValues.length; j++) {
-				accumulatedFitness += Math.max(fitnessValues[j], 0.0);
-				if (accumulatedFitness >= rouletteWheelPosition) {
-					selectedIndex = j;
-					break;
+			// Find the index of the individual with the highest fitness in the tournament
+			int bestIndex = 0;
+			for (int j = 1; j < tournamentSize; j++) {
+				if (fitnessValues[tournamentIndices[j]] > fitnessValues[tournamentIndices[bestIndex]]) {
+					bestIndex = j;
 				}
 			}
 
-			parents.set(i, this.NeuralNetworkList.get(selectedIndex));
+			parents.add(NeuralNetworkList.get(tournamentIndices[bestIndex]));
 		}
 
 		return parents;
@@ -258,15 +232,33 @@ public class Population {
 	}
 
 	public void updatePopulation(List<NeuralNetworkGameController> offspring) {
-		// Remove the last (population size - elite individuals) elements from the
-		// population
-		int numElite = 1; // Assuming you want to keep the top 2 fittest individuals
-		int elementsToRemove = numElite;
-		for (int i = 0; i < elementsToRemove; i++) {
-			NeuralNetworkList.remove(NeuralNetworkList.size() - 1);
+		// Ensure parents exist (optional, for safety)
+		if (offspring.size() < 2) {
+			throw new IllegalArgumentException("Requires at least two offspring for population update");
 		}
-		// Add the new offspring to the beginning of the population
-		NeuralNetworkList.addAll(0, offspring);
+
+		// Get current best fitness
+		double bestFitness = getBestFitness();
+
+		// Remove the last (population size - elite individuals - 2) elements from the
+		// population
+		int numElite = 2; // Assuming you already keep the top 2 fittest individuals
+		int elementsToRemove = NeuralNetworkList.size() - numElite - offspring.size();
+		for (int i = 0; i < elementsToRemove; i++) {
+			NeuralNetworkGameController lastIndividual = NeuralNetworkList.remove(NeuralNetworkList.size() - 1);
+			BreakoutBoard lastIndiividualBoard = new BreakoutBoard(lastIndividual, false, seed);
+			if (lastIndiividualBoard.getFitness() < bestFitness) {
+				// Remove individual with lower fitness than bestFitness
+				NeuralNetworkList.remove(lastIndividual);
+				elementsToRemove++; // Decrement elementsToRemove since we removed another individual
+			}
+		}
+
+		// Add parents to indices 0 and 1
+		NeuralNetworkList.addAll(0, offspring.subList(0, 2));
+
+		// Add remaining offspring to the end of the population
+		NeuralNetworkList.addAll(offspring.subList(2, offspring.size()));
 	}
 
 	public int getSize() {
