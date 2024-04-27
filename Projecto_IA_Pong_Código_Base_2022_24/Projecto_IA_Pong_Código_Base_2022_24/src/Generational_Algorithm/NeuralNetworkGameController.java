@@ -1,7 +1,5 @@
 package Generational_Algorithm;
 
-import java.util.Random;
-
 import breakout.BreakoutBoard;
 import utils.Commons;
 import utils.GameController;
@@ -30,49 +28,25 @@ public class NeuralNetworkGameController implements GameController {
 		outputWeights = new double[hiddenDim][outputDim];
 		outputBiases = new double[outputDim];
 
-		double[] values = new double[200];
-		values = generateRandomArray(values.length, 0, 10);
+		// Initialize biases for hidden layer with a small positive value
+		for (int i = 0; i < hiddenDim; i++) {
+			hiddenBiases[i] = 0.1;
+		}
 
-		int index = 0;
-
-		hiddenWeights = new double[inputDim][hiddenDim];
+		// Glorot initialization for weights
+		double weightScale = Math.sqrt(2.0 / (inputDim + hiddenDim));
 		for (int i = 0; i < inputDim; i++) {
 			for (int j = 0; j < hiddenDim; j++) {
-				hiddenWeights[i][j] = values[index];
-				index++;
+				hiddenWeights[i][j] = Math.random() * weightScale * 2 - weightScale;
 			}
 		}
 
-		hiddenBiases = new double[hiddenDim];
-
-		for (int i = 0; i < hiddenDim; i++) {
-			hiddenBiases[i] = values[index];
-			index++;
-		}
-
-		outputWeights = new double[hiddenDim][outputDim];
+		weightScale = Math.sqrt(2.0 / (hiddenDim + outputDim));
 		for (int i = 0; i < hiddenDim; i++) {
 			for (int j = 0; j < outputDim; j++) {
-				outputWeights[i][j] = values[index];
-				index++;
+				outputWeights[i][j] = Math.random() * weightScale * 2 - weightScale;
 			}
 		}
-		outputBiases = new double[outputDim];
-		for (int i = 0; i < outputDim; i++) {
-			outputBiases[i] = values[index];
-			index++;
-		}
-	}
-
-	public static double[] generateRandomArray(int length, int minValue, int maxValue) {
-		double[] randomArray = new double[length];
-		Random random = new Random();
-
-		for (int i = 0; i < length; i++) {
-			randomArray[i] = (double) random.nextInt(maxValue - minValue + 1) + minValue;
-		}
-
-		return randomArray;
 	}
 
 	public int nextMove(int[] currentState) {
@@ -225,5 +199,6 @@ public class NeuralNetworkGameController implements GameController {
 		}
 		return this.hiddenWeights; // Return the entire inner array for the specified layer
 	}
-
+	
+	
 }
