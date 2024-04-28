@@ -8,8 +8,7 @@ public class GeneticAlgorithm {
 
 	public static void main(String[] args) {
 		// Initialize the population size (adjust as needed)
-		int populationSize = 5000;
-
+		int populationSize = 10000;
 		// Create an instance of NeuralNetworkGameController (assuming it defines the
 		// network)
 		NeuralNetworkGameController nnController = new NeuralNetworkGameController();
@@ -22,7 +21,7 @@ public class GeneticAlgorithm {
 		List<NeuralNetworkGameController> parents = population.selectParents(fitnessValues, 10);
 
 		// Set the maximum number of generations for evolution
-		int maxGenerations = 1000;
+		int maxGenerations = 100000;
 		double best1st = 0;
 
 		// Main loop of the genetic algorithm
@@ -42,7 +41,7 @@ public class GeneticAlgorithm {
 				System.err.println("Error: Population is empty after update!");
 			}
 
-			System.out.println("Generation: " + generation + " Best Fitness: " + population.getBestFitness());
+			//System.out.println("Generation: " + generation + " Best Fitness: " + population.getBestFitness());
 
 			// Update parent selection
 			parents = population.selectParents(fitnessValues, 10);
@@ -51,7 +50,7 @@ public class GeneticAlgorithm {
 		// Retrieve the best individual after evolution
 		NeuralNetworkGameController bestIndividual = population.getBestIndividual();
 		int bestSeed = population.getSeed(); // Assuming Population stores the best seed
-		System.out.println(best1st);
+		System.out.println("First Best Result" + best1st);
 		if (bestIndividual != null) {
 			// Visualize the result using Breakout game GUI (modify if needed)
 			visualizeResult(bestIndividual, bestSeed);

@@ -155,8 +155,8 @@ public class Population {
 
 		parent2Game.runSimulation();
 
-		System.out.println("Parent 1 Fitness: " + parent1Game.getFitness());
-		System.out.println("Parent 2 Fitness: " + parent2Game.getFitness());
+		//System.out.println("Parent 1 Fitness: " + parent1Game.getFitness());
+		//System.out.println("Parent 2 Fitness: " + parent2Game.getFitness());
 
 		// Create a new child network with the same structure as parents
 		NeuralNetworkGameController child = new NeuralNetworkGameController();
@@ -183,7 +183,7 @@ public class Population {
 			BreakoutBoard childGame = new BreakoutBoard(child, false, seed); // Set appropriate parameters for childGame
 			childGame.runSimulation();
 
-			System.out.println("Child Fitness: " + childGame.getFitness()); // Replace with your fitness evaluation
+			//System.out.println("Child Fitness: " + childGame.getFitness()); // Replace with your fitness evaluation
 																			// function
 		}
 
