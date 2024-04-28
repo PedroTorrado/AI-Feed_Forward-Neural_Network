@@ -45,7 +45,6 @@ public class BreakoutBoard extends JPanel {
 	}
 
 	/**
-	 * 
 	 * Creates a new BreakoutBoard with a controller. If the boolean parameter
 	 * withGui is set to false, indicating the absence of a graphical user
 	 * interface, the program operates in headless mode; otherwise, it initiates

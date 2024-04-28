@@ -2,8 +2,7 @@ package breakout;
 
 import javax.swing.JFrame;
 
-import Generational_Algorithm.BreakoutController;
-import Generational_Algorithm.NeuralNetworkGameController;
+import utils.Commons;
 import utils.GameController;
 
 public class Breakout extends JFrame {
@@ -22,7 +21,7 @@ public class Breakout extends JFrame {
 	}
 
 	public static void main(String[] args) {
-		Breakout b = new Breakout(new BreakoutController(), 100);
+		Breakout b = new Breakout(new algorithms.GeneticAlgorithm().beginSearch(), Commons.SEED);
 	}
 
 }
