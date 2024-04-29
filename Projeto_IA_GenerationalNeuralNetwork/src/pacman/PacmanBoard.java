@@ -31,11 +31,11 @@ public class PacmanBoard extends JPanel implements ActionListener {
 
 	private Random r = new Random();
 
-	private static final int NONE = 0;
-	private static final int LEFT = 1;
-	private static final int RIGHT = 2;
-	private static final int UP = 3;
-	private static final int DOWN = 4;
+	public static final int NONE = 0;
+	public static final int LEFT = 1;
+	public static final int RIGHT = 2;
+	public static final int UP = 3;
+	public static final int DOWN = 4;
 
 	private Dimension d;
 	private final Font smallFont = new Font("Helvetica", Font.BOLD, 14);
@@ -699,6 +699,7 @@ public class PacmanBoard extends JPanel implements ActionListener {
 
 		int pos = pacman_x / BLOCK_SIZE + N_BLOCKS * (int) (pacman_y / BLOCK_SIZE);
 		state[pos] = 3;
+		//System.out.println(state.length);
 
 		return state;
 	}

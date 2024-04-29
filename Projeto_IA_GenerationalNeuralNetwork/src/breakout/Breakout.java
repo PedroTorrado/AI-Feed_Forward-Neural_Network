@@ -1,5 +1,7 @@
 package breakout;
 
+import java.io.IOException;
+
 import javax.swing.JFrame;
 
 import utils.Commons;
@@ -20,8 +22,8 @@ public class Breakout extends JFrame {
 		setVisible(true);
 	}
 
-	public static void main(String[] args) {
-		Breakout b = new Breakout(new algorithms.GeneticAlgorithm().beginSearch(), Commons.SEED);
+	public static void main(String[] args) throws IOException {
+		Breakout b = new Breakout(new algorithms.GeneticAlgorithm(Commons.BREAKOUT_STATE_SIZE, Commons.BREAKOUT_HIDDEN_DIM, Commons.BREAKOUT_NUM_ACTIONS).beginSearch(Commons.BREAKOUT_STATE_SIZE, Commons.BREAKOUT_HIDDEN_DIM, Commons.BREAKOUT_NUM_ACTIONS), Commons.SEED);
 	}
 
 }
