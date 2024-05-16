@@ -8,8 +8,6 @@ import java.io.ObjectInputStream;
 
 import javax.swing.JFrame;
 
-import breakout.Breakout;
-import utils.Commons;
 import utils.GameController;
 
 public class Pacman extends JFrame {
@@ -25,9 +23,4 @@ public class Pacman extends JFrame {
 			setVisible(true);
 		});
 	}
-	
-	public static void main(String[] args) throws IOException {
-		Pacman b = new Pacman(new algorithms.GeneticAlgorithm(Commons.PACMAN_STATE_SIZE, 10, Commons.PACMAN_NUM_ACTIONS).beginSearch(Commons.PACMAN_STATE_SIZE, 10, Commons.PACMAN_NUM_ACTIONS), true, Commons.SEED);
-	}
-
 }
